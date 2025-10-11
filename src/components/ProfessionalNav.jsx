@@ -17,9 +17,6 @@ const ProfessionalNav = ({ onGetStartedClick }) => {
 	const [activeLink, setActiveLink] = useState('home');
 	const [showUserDropdown, setShowUserDropdown] = useState(false);
 
-	// Debug logging
-	console.log('ProfessionalNav - Auth State:', { user, isAuthenticated });
-
 	// Handle scroll effect
 	useEffect(() => {
 		const handleScroll = () => {

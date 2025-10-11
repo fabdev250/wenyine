@@ -30,7 +30,8 @@ const UserDashboard = () => {
   const tabs = [
     { id: 'overview', name: 'Incamake', icon: '📊' },
     { id: 'exams', name: 'Ibizamini', icon: '📝' },
-    { id: 'progress', name: 'Iterambere', icon: '📈' }
+    { id: 'progress', name: 'Iterambere', icon: '📈' },
+    { id: 'profile', name: 'Profili', icon: '👤' }
   ];
 
   const recentExams = [
@@ -61,6 +62,17 @@ const UserDashboard = () => {
 
   const progress = getOverallProgress();
   const remainingDays = hasPremiumAccess ? getRemainingDays('premium') : hasBasicAccess ? getRemainingDays('basic') : 0;
+  
+  // Use user progress data from AuthContext or create default values
+  const userProgress = user.progress || { theoryCourse: 0, practicalCourse: 0, mockExams: 0 };
+  const combinedProgress = {
+    ...progress,
+    theoryCourse: userProgress.theoryCourse,
+    practicalCourse: userProgress.practicalCourse,
+    mockExams: userProgress.mockExams,
+    examsTaken: userProgress.examsTaken || progress.examsCompleted,
+    examsPassed: userProgress.examsPassed || progress.totalExamsPassed
+  };
 
   const quickActions = [
     {
@@ -100,25 +112,25 @@ const UserDashboard = () => {
   const stats = [
     {
       label: 'Lessons Completed',
-      value: progress.lessonsCompleted,
+      value: combinedProgress.lessonsCompleted,
       icon: BookOpen,
       color: 'text-blue-600'
     },
     {
       label: 'Videos Watched',
-      value: progress.videosCompleted,
+      value: combinedProgress.videosCompleted,
       icon: PlayCircle,
       color: 'text-purple-600'
     },
     {
       label: 'Exams Taken',
-      value: progress.examsCompleted,
+      value: combinedProgress.examsCompleted,
       icon: ClipboardList,
       color: 'text-green-600'
     },
     {
       label: 'Exams Passed',
-      value: progress.totalExamsPassed,
+      value: combinedProgress.totalExamsPassed,
       icon: Trophy,
       color: 'text-yellow-600'
     }
@@ -174,7 +186,7 @@ const UserDashboard = () => {
             whileHover={{ scale: 1.02 }}
           >
             <div className="text-3xl mb-2">📚</div>
-            <div className="text-2xl font-bold text-blue-600">{progress.examsTaken}</div>
+            <div className="text-2xl font-bold text-blue-600">{combinedProgress.examsTaken}</div>
             <div className="text-sm text-gray-600">Ibizamini Byakozwe</div>
           </motion.div>
 
@@ -183,7 +195,7 @@ const UserDashboard = () => {
             whileHover={{ scale: 1.02 }}
           >
             <div className="text-3xl mb-2">✅</div>
-            <div className="text-2xl font-bold text-green-600">{progress.examsPassed}</div>
+            <div className="text-2xl font-bold text-green-600">{combinedProgress.examsPassed}</div>
             <div className="text-sm text-gray-600">Ibizamini Byatsindiye</div>
           </motion.div>
 
@@ -192,7 +204,7 @@ const UserDashboard = () => {
             whileHover={{ scale: 1.02 }}
           >
             <div className="text-3xl mb-2">📊</div>
-            <div className="text-2xl font-bold text-purple-600">{Math.round((progress.examsPassed / Math.max(progress.examsTaken, 1)) * 100)}%</div>
+            <div className="text-2xl font-bold text-purple-600">{Math.round((combinedProgress.examsPassed / Math.max(combinedProgress.examsTaken, 1)) * 100)}%</div>
             <div className="text-sm text-gray-600">Igipimo cyo Gutsinda</div>
           </motion.div>
 
@@ -201,7 +213,7 @@ const UserDashboard = () => {
             whileHover={{ scale: 1.02 }}
           >
             <div className="text-3xl mb-2">🎯</div>
-            <div className="text-2xl font-bold text-orange-600">{Math.round((progress.theoryCourse + progress.practicalCourse + progress.mockExams) / 3)}%</div>
+            <div className="text-2xl font-bold text-orange-600">{Math.round((combinedProgress.theoryCourse + combinedProgress.practicalCourse + combinedProgress.mockExams) / 3)}%</div>
             <div className="text-sm text-gray-600">Iterambere Rusange</div>
           </motion.div>
         </div>
@@ -308,13 +320,13 @@ const UserDashboard = () => {
                     <div>
                       <div className="flex justify-between mb-2">
                         <span className="text-gray-600">Isomo ry'Injyana</span>
-                        <span className="font-semibold">{progress.theoryCourse}%</span>
+                        <span className="font-semibold">{combinedProgress.theoryCourse}%</span>
                       </div>
                       <div className="bg-gray-200 rounded-full h-3">
                         <motion.div
                           className="bg-blue-500 h-3 rounded-full"
                           initial={{ width: 0 }}
-                          animate={{ width: `${progress.theoryCourse}%` }}
+                          animate={{ width: `${combinedProgress.theoryCourse}%` }}
                           transition={{ duration: 1 }}
                         />
                       </div>
@@ -322,13 +334,13 @@ const UserDashboard = () => {
                     <div>
                       <div className="flex justify-between mb-2">
                         <span className="text-gray-600">Amasomo y'Ibikorwa</span>
-                        <span className="font-semibold">{progress.practicalCourse}%</span>
+                        <span className="font-semibold">{combinedProgress.practicalCourse}%</span>
                       </div>
                       <div className="bg-gray-200 rounded-full h-3">
                         <motion.div
                           className="bg-green-500 h-3 rounded-full"
                           initial={{ width: 0 }}
-                          animate={{ width: `${progress.practicalCourse}%` }}
+                          animate={{ width: `${combinedProgress.practicalCourse}%` }}
                           transition={{ duration: 1, delay: 0.2 }}
                         />
                       </div>
@@ -336,13 +348,13 @@ const UserDashboard = () => {
                     <div>
                       <div className="flex justify-between mb-2">
                         <span className="text-gray-600">Ibizamini byo Kwigeneza</span>
-                        <span className="font-semibold">{progress.mockExams}%</span>
+                        <span className="font-semibold">{combinedProgress.mockExams}%</span>
                       </div>
                       <div className="bg-gray-200 rounded-full h-3">
                         <motion.div
                           className="bg-purple-500 h-3 rounded-full"
                           initial={{ width: 0 }}
-                          animate={{ width: `${progress.mockExams}%` }}
+                          animate={{ width: `${combinedProgress.mockExams}%` }}
                           transition={{ duration: 1, delay: 0.4 }}
                         />
                       </div>
@@ -438,9 +450,9 @@ const UserDashboard = () => {
                 <h3 className="text-xl font-bold text-gray-900 mb-6">Iterambere mu buryo bwimbitse</h3>
                 <div className="space-y-6">
                   {[
-                    { title: 'Amategeko y\'Umuhanda', progress: progress.theoryCourse, color: 'blue' },
+                    { title: 'Amategeko y\'Umuhanda', progress: combinedProgress.theoryCourse, color: 'blue' },
                     { title: 'Ibimenyetso by\'Umuhanda', progress: 65, color: 'green' },
-                    { title: 'Gutwara mu Bikorwa', progress: progress.practicalCourse, color: 'purple' },
+                    { title: 'Gutwara mu Bikorwa', progress: combinedProgress.practicalCourse, color: 'purple' },
                     { title: 'Ibyihutirwa', progress: 80, color: 'orange' }
                   ].map((item, index) => (
                     <div key={index}>
@@ -482,7 +494,7 @@ const UserDashboard = () => {
                         </div>
                         <span className="font-medium text-gray-900">Gutsinda ibizamini 10</span>
                       </div>
-                      <span className="text-green-600 font-semibold">{progress.examsPassed}/10</span>
+                      <span className="text-green-600 font-semibold">{combinedProgress.examsPassed}/10</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
